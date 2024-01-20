@@ -77,25 +77,61 @@ class Kinematics:
         ax.view_init(elev=30, azim=-75)
         plt.legend()
         # Show the plot
-        plt.show()          
+        plt.show()  
+######################### end of forward  inverse BEGINS #################
+    def objective_fggunction(self,*parameters) :
+         pass  
+    def inverse_kinematics_optimization(self, target_position):
+        def objective_function(params):
+            a, theta1, theta2, theta3 = params
+            self.Table[0][1] = a
+            self.Table[2][0] = theta1
+            self.Table[3][0] = theta2
+            self.Table[4][0] = theta3
+            self.get_transformed_values()
+            end_effector_position = self.Matrices[-1][:3, 3]
+            error = np.linalg.norm(end_effector_position - target_position)
+            return error
+
+        initial_guess = [self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0]]
+        result = minimize(objective_function, initial_guess, method='SLSQP')
+
+        if result.success:
+            optimized_params = result.x
+            self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0] = optimized_params
+            self.get_transformed_values()
+            self.geting_positions()
+            self.plotting_points()
+            self.show_table()
+        else:
+            print("Optimization failed.")
 
 
 
 
 #Parameters:
-a = 4 
-theta1 = np.radians(90)
-theta2 = np.radians(0)
+a = 4
+theta1 = np.radians(45)
+theta2 = np.radians(-0)
 theta3 = np.radians(0)
+
+# Target end-effector position
+target_position = np.array([4, 0, 22])
+
+# Create Kinematics object
 k = Kinematics()
+
+# Define DH parameters
 k.add_values([0, a, 0, 0])
 k.add_values([0, 0, 4, np.radians(90)])
-k.add_values([theta1 , 0 , 6 , 0])
-k.add_values([theta2 , 0 , 6 , 0])
-k.add_values([theta3 , 0 , 6 , 0])
+k.add_values([theta1, 0, 6, 0])
+k.add_values([theta2, 0, 6, 0])
+k.add_values([theta3, 0, 6, 0])
+
+# Forward kinematics to initialize Matrices
 k.get_transformed_values()
-k.geting_positions()
-k.plotting_points()
-k.show_table()
+
+# Use inverse kinematics with optimization to achieve the target position
+k.inverse_kinematics_optimization(target_position)
  
 
