@@ -30,7 +30,7 @@ class Kinematics:
         for row in self.Table:
             print("|", end=" ")
             for i, value in enumerate(row):
-                # Convert angles to degrees if needed
+                # Convert angles to degrees 
                 if angles_in_degrees and i == 0 or i ==3:
                     value = np.degrees(value)
                 print(f"{value:8.3f} |", end=" ")
@@ -62,13 +62,13 @@ class Kinematics:
         positions_array = np.array(self.positions)
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        # Scatter plot
+        
         ax.scatter(positions_array[:, 0], positions_array[:, 1], positions_array[:, 2], c='r', marker='o')
-        # Plot lines connecting the points
+        
         ax.plot(positions_array[:, 0], positions_array[:, 1], positions_array[:, 2], linestyle='-', color='b')
         for i, pos in enumerate(positions_array):
             ax.text(pos[0], pos[1], pos[2], f'Joint {i+1}', color='black', fontsize=8, ha='right')
-        # Set labels for axes
+       
         ax.set_xlabel('X-axis')
         ax.set_ylabel('Y-axis')
         ax.set_zlabel('Z-axis')
@@ -81,7 +81,7 @@ class Kinematics:
         ax.quiver(0, 0, 0, 0, 0, 4, color='y', label='Z-axis')
         ax.view_init(elev=30, azim=-75)
         plt.legend()
-        # Show the plot
+        
         plt.show()          
 
 
