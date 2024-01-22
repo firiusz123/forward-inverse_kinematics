@@ -18,8 +18,8 @@ class Kinematics:
 
     def add_values(self, dh_parameters):
         self.Table.append(dh_parameters)
-    def show_table(self):
-        header = ["Theta", "d", "a", "Alfa"]
+    def show_table(self, angles_in_degrees=True):
+        header = [" Theta", "d", "a", "Alfa"]
         print("+---------" * len(header) + "+")
         print("|", end=" ")
         for h in header:
@@ -29,10 +29,15 @@ class Kinematics:
 
         for row in self.Table:
             print("|", end=" ")
-            for value in row:
+            for i, value in enumerate(row):
+                # Convert angles to degrees if needed
+                if angles_in_degrees and i == 0 or i ==3:
+                    value = np.degrees(value)
                 print(f"{value:8.3f} |", end=" ")
             print()
         print("+---------" * len(header) + "+")
+
+
     def get_transformed_values(self):
         k = []
         for i in self.Table:
@@ -51,7 +56,7 @@ class Kinematics:
             result = np.linalg.multi_dot(m[0:i+2])
             self.positions.append(result[:3,3])
         for i in self.positions:
-            print(i)        
+            print(np.round(i,5))        
         
     def plotting_points(self):
         positions_array = np.array(self.positions)
@@ -67,7 +72,7 @@ class Kinematics:
         ax.set_xlabel('X-axis')
         ax.set_ylabel('Y-axis')
         ax.set_zlabel('Z-axis')
-        n = 20
+        n = 500
         ax.set_xlim([-n, n])
         ax.set_ylim([-n, n])
         ax.set_zlim([-n, n])
@@ -83,16 +88,16 @@ class Kinematics:
 
 
 #Parameters:
-a = 4 
-theta1 = np.radians(90)
-theta2 = np.radians(0)
-theta3 = np.radians(0)
+a = 100 
+theta1 = np.radians(45)
+theta2 = np.radians(45)
+theta3 = np.radians(-90)
 k = Kinematics()
 k.add_values([0, a, 0, 0])
-k.add_values([0, 0, 4, np.radians(90)])
-k.add_values([theta1 , 0 , 6 , 0])
-k.add_values([theta2 , 0 , 6 , 0])
-k.add_values([theta3 , 0 , 6 , 0])
+k.add_values([0, 0, 100, np.radians(60)])
+k.add_values([theta1 , 0 , 120 , 0])
+k.add_values([theta2 , 0 , 120 , 0])
+k.add_values([theta3 , 0 , 140 , 0])
 k.get_transformed_values()
 k.geting_positions()
 k.plotting_points()

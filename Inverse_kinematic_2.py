@@ -19,18 +19,20 @@ class Kinematics:
     def add_values(self, dh_parameters):
         self.Table.append(dh_parameters)
 
-    def show_table(self):
-        header = ["Theta", "d", "a", "Alfa"]
+    def show_table(self, angles_in_degrees=True):
+        header = [" Theta", "d", "a", "Alfa"]
         print("+---------" * len(header) + "+")
         print("|", end=" ")
         for h in header:
             print(f"{h:8}", end=" | ")
         print()
         print("+---------" * len(header) + "+")
-
         for row in self.Table:
             print("|", end=" ")
-            for value in row:
+            for i, value in enumerate(row):
+                # Convert angles to degrees 
+                if angles_in_degrees and i == 0 or i ==3:
+                    value = np.degrees(value)
                 print(f"{value:8.3f} |", end=" ")
             print()
         print("+---------" * len(header) + "+")
@@ -49,23 +51,23 @@ class Kinematics:
         self.positions.append(m[0][:3, 3])
         for i in range(len(m)-1):
             result = np.linalg.multi_dot(m[0:i+2])
+            print(result[:3,3])
             self.positions.append(result[:3, 3])
 
     def plotting_points(self):
         positions_array = np.array(self.positions)
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        # Scatter plot
+        
         ax.scatter(positions_array[:, 0], positions_array[:, 1], positions_array[:, 2], c='r', marker='o')
-        # Plot lines connecting the points
         ax.plot(positions_array[:, 0], positions_array[:, 1], positions_array[:, 2], linestyle='-', color='b')
         for i, pos in enumerate(positions_array):
             ax.text(pos[0], pos[1], pos[2], f'Joint {i+1}', color='black', fontsize=8, ha='right')
-        # Set labels for axes
+
         ax.set_xlabel('X-axis')
         ax.set_ylabel('Y-axis')
         ax.set_zlabel('Z-axis')
-        n = 20
+        n = 450
         ax.set_xlim([-n, n])
         ax.set_ylim([-n, n])
         ax.set_zlim([-n, n])
@@ -74,7 +76,7 @@ class Kinematics:
         ax.quiver(0, 0, 0, 0, 0, 4, color='y', label='Z-axis')
         ax.view_init(elev=30, azim=-75)
         plt.legend()
-        # Show the plot
+        
         plt.show()
 
     def inverse_kinematics_optimization(self, target_position):
@@ -91,7 +93,8 @@ class Kinematics:
             return error
         #bounds = [(0, 10), (-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
         initial_guess = [self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0]]
-        result = minimize(objective_function, initial_guess, method='L-BFGS-B', tol=1e-6)
+        bounds = [(None, None), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2)]
+        result = minimize(objective_function, initial_guess, method='L-BFGS-B', tol=1e-4 , bounds=bounds)
         print(result)
         if result.success:
             optimized_params = result.x
@@ -106,20 +109,19 @@ class Kinematics:
 
 # Example usage:
 # Target end-effector position
-target_position = np.array([4, 0, 22])
+target_position = np.array([324.85281, 102.42641, 277.40774] )
 
-# Create Kinematics object
+
 k = Kinematics()
 
 # Define DH parameters
-k.add_values([0, 4, 0, 0])
-k.add_values([0, 0, 4, np.radians(90)])
-k.add_values([np.radians(0), 0, 6, 0])
-k.add_values([np.radians(0), 0, 6, 0])
-k.add_values([np.radians(-45), 0, 6, 0])
+k.add_values([0, 100, 0, 0])
+k.add_values([0, 0, 100, np.radians(90)])
+k.add_values([np.radians(0), 0, 120, 0])
+k.add_values([np.radians(0), 0, 120, 0])
+k.add_values([np.radians(0), 0, 140, 0])
 
-# Forward kinematics to initialize Matrices
+
 k.get_transformed_values()
 
-# Use inverse kinematics with optimization to achieve the target position
 k.inverse_kinematics_optimization(target_position)
