@@ -11,6 +11,7 @@ class Kinematics:
         self.target_position=[]
         self.mask= []
         self.indexes_to_optimize=[]
+        self.list_of_parameters = []
 
         
 
@@ -29,7 +30,7 @@ class Kinematics:
         self.mask.append(mask_setup)
     def show_mask(self):
         print(np.array(self.mask))
-    def get_variables_to_optimize(self):
+    def get_indexes_to_optimize(self):
         for i in range(len(self.mask)):
             #print(self.mask[i])
             for j in range(len(self.mask[i])):
@@ -37,6 +38,13 @@ class Kinematics:
                 if self.mask[i][j] == 1 :
                     self.indexes_to_optimize.append([i,j])
         print(self.indexes_to_optimize)
+    def get_variables_to_optimize(self,array_of_params):
+        self.list_of_parameters=[]
+        for i in array_of_params:
+            self.list_of_parameters.append(self.Table[i[0]][i[1]])
+        print(self.list_of_parameters)
+        return 
+        
 
     def show_table(self, angles_in_degrees=True):
         header = [" Theta", "d", "a", "Alfa"]
@@ -100,7 +108,7 @@ class Kinematics:
 
     def inverse_kinematics_optimization(self):
         def objective_function(params):
-            a, theta1, theta2, theta3 = params
+            self.list_of_parameters = params
             self.Table[0][1] = a
             self.Table[2][0] = theta1
             self.Table[3][0] = theta2
