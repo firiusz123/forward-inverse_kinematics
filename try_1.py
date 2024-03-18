@@ -44,6 +44,10 @@ class Kinematics:
             self.list_of_parameters.append(self.Table[i[0]][i[1]])
         print(self.list_of_parameters)
         return 
+    def swap_table_variables(self,array):
+        for i in range(len(self.indexes_to_optimize)):
+            self.Table[i[0]][i[1]] = array[i]
+            
         
 
     def show_table(self, angles_in_degrees=True):
@@ -109,17 +113,14 @@ class Kinematics:
     def inverse_kinematics_optimization(self):
         def objective_function(params):
             self.list_of_parameters = params
-            self.Table[0][1] = a
-            self.Table[2][0] = theta1
-            self.Table[3][0] = theta2
-            self.Table[4][0] = theta3
+            Kinematics.swap_table_variables(self,params)
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
             error = np.linalg.norm(end_effector_position - self.target_position)
             return error
         #bounds = [(0, 10), (-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
-        initial_guess = [self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0]]
+        initial_guess = [self.list_of_parameters]
         bounds = [(None, None), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2)]
         result = minimize(objective_function, initial_guess, method='L-BFGS-B', tol=1e-4 , bounds=bounds)
         print(result)
@@ -156,10 +157,10 @@ k.add_values([np.radians(0), 0, 140, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
 k.show_mask()
-k.get_variables_to_optimize()
 
 
-#k.set_target_position(target_position)
 
-#k.get_transformed_values()
-#k.inverse_kinematics_optimization()
+k.set_target_position(target_position)
+
+k.get_transformed_values()
+k.inverse_kinematics_optimization()
