@@ -43,7 +43,6 @@ class Kinematics:
         for i in array_of_params:
             self.list_of_parameters.append(self.Table[i[0]][i[1]])
         print(self.list_of_parameters)
-        return 
     def swap_table_variables(self,array):
         for i in range(len(self.indexes_to_optimize)):
             self.Table[i[0]][i[1]] = array[i]
@@ -111,6 +110,8 @@ class Kinematics:
         plt.show()
 
     def inverse_kinematics_optimization(self):
+        k.get_indexes_to_optimize()
+        k.get_variables_to_optimize(self.indexes_to_optimize)
         def objective_function(params):
             self.list_of_parameters = params
             Kinematics.swap_table_variables(self,params)
@@ -120,13 +121,14 @@ class Kinematics:
             error = np.linalg.norm(end_effector_position - self.target_position)
             return error
         #bounds = [(0, 10), (-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
-        initial_guess = [self.list_of_parameters]
+        initial_guess = self.list_of_parameters
         bounds = [(None, None), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2)]
         result = minimize(objective_function, initial_guess, method='L-BFGS-B', tol=1e-4 , bounds=bounds)
         print(result)
         if result.success:
             optimized_params = result.x
-            self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0] = optimized_params
+            self.indexes_to_optimize = optimized_params
+            swap_table_variables(self.indexes_to_optimize)
             self.get_transformed_values()
             self.geting_positions()
             self.plotting_points()
@@ -151,12 +153,16 @@ k.add_mask(  [0 , 0 , 0 ,0])
 
 k.add_values([np.radians(0), 0, 120, 0])
 k.add_mask([1 , 0 , 0 , 0])
+
 k.add_values([np.radians(0), 0, 120, 0])
 k.add_mask([1 , 0 , 0 , 0])
+
 k.add_values([np.radians(0), 0, 140, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
 k.show_mask()
+
+
 
 
 
