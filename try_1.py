@@ -128,9 +128,10 @@ class Kinematics:
         
         plt.show()
     def inverse_kinematics_optimization(self):
+        k.get_indexes_to_optimize()
+        k.get_variables_to_optimize()
         def objective_function(self):
-            k.get_indexes_to_optimize()
-            k.get_variables_to_optimize()
+            
             k.swap_table_variables()
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
