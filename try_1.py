@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-np.warnings.filterwarnings('ignore')
+np.seterr(all="ignore")
 
 class Kinematics:
     def __init__(self):
