@@ -2,6 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+np.warnings.filterwarnings('ignore')
 
 class Kinematics:
     def __init__(self):
@@ -37,19 +38,21 @@ class Kinematics:
                 #print(self.mask[i][j])
                 if self.mask[i][j] == 1 :
                     self.indexes_to_optimize.append([i,j])
-        print(self.indexes_to_optimize)
+        #print(self.indexes_to_optimize)
 
     def get_variables_to_optimize(self):
         self.list_of_parameters=[]
         for i in self.indexes_to_optimize:
             self.list_of_parameters.append(self.Table[i[0]][i[1]])
-        print(self.list_of_parameters)
+        #print(self.list_of_parameters)
 
     def change_variables_to_optimize(self,D1_array):
-        self.list_of_parameters=[]
-        for i in D1_array:
-            self.list_of_parameters.append(self.Table[i[0]][i[1]])
-            print(self.list_of_parameters)
+        list_of_parameters_swap = []
+        for i in range(len(self.list_of_parameters)):
+            list_of_parameters_swap.append(D1_array)
+        self.list_of_parameters = np.array(list_of_parameters_swap)
+        #print(self.list_of_parameters)
+        #print(list_of_parameters_swap)
 
    
     def swap_table_variables(self):
@@ -131,13 +134,14 @@ class Kinematics:
         k.get_indexes_to_optimize()
         k.get_variables_to_optimize()
         def objective_function(self):
-            
+            k.change_variables_to_optimize([200,10,0,0])
             k.swap_table_variables()
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
-            error = np.linalg.norm(end_effector_position - self.target_position)
-            print(error)
+            #error = np.linalg.norm(end_effector_position - self.target_position)
+            error = np.array(end_effector_position)
+            print(error.shape , 'this is suppouse to be error ')
         objective_function(self)
 """ 
     def inverse_kinematics_optimization(self):
