@@ -13,7 +13,7 @@ class Kinematics:
         self.indexes_to_optimize=[]
         self.list_of_parameters = []
 
-        
+       #####################    BASIC FUNCTIONS ################################### 
 
     def Transform_matrix(self, theta, d, a, alfa):
         T = np.array([[np.cos(theta), -np.sin(theta)*np.cos(alfa), np.sin(alfa)*np.sin(theta), a*np.cos(theta)],
@@ -38,14 +38,28 @@ class Kinematics:
                 if self.mask[i][j] == 1 :
                     self.indexes_to_optimize.append([i,j])
         print(self.indexes_to_optimize)
-    def get_variables_to_optimize(self,array_of_params):
+
+    def get_variables_to_optimize(self):
         self.list_of_parameters=[]
-        for i in array_of_params:
+        for i in self.indexes_to_optimize:
             self.list_of_parameters.append(self.Table[i[0]][i[1]])
         print(self.list_of_parameters)
-    def swap_table_variables(self,array):
-        for i in range(len(self.indexes_to_optimize)):
-            self.Table[i[0]][i[1]] = array[i]
+
+    def change_variables_to_optimize(self,D1_array):
+        self.list_of_parameters=[]
+        for i in D1_array:
+            self.list_of_parameters.append(self.Table[i[0]][i[1]])
+            print(self.list_of_parameters)
+
+   
+    def swap_table_variables(self):
+        k = 0 
+        for i in (self.indexes_to_optimize):
+            self.Table[i[0]][i[1]] = self.list_of_parameters[k]
+            #print('those are i and j',[i[0],  i[1]])
+            #print("this is k " ,k)
+            #print('the value to be put into the table ' ,   self.list_of_parameters[k])
+            k=k+1
             
         
 
@@ -83,6 +97,11 @@ class Kinematics:
             result = np.linalg.multi_dot(m[0:i+2])
             print(result[:3,3])
             self.positions.append(result[:3, 3])
+ #####################    BASIC FUNCTIONS ################################### 
+
+
+
+
 
     def plotting_points(self):
         positions_array = np.array(self.positions)
@@ -108,17 +127,29 @@ class Kinematics:
         plt.legend()
         
         plt.show()
-
+    def inverse_kinematics_optimization(self):
+        def objective_function(self):
+            k.get_indexes_to_optimize()
+            k.get_variables_to_optimize()
+            k.swap_table_variables()
+            self.get_transformed_values()
+            end_f_matrix=np.linalg.multi_dot(self.Matrices)
+            end_effector_position = end_f_matrix[:3, 3]
+            error = np.linalg.norm(end_effector_position - self.target_position)
+            print(error)
+        objective_function(self)
+""" 
     def inverse_kinematics_optimization(self):
         k.get_indexes_to_optimize()
         k.get_variables_to_optimize(self.indexes_to_optimize)
         def objective_function(params):
             self.list_of_parameters = params
-            Kinematics.swap_table_variables(self,params)
+            Kinematics.swap_table_variables(self)
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
             error = np.linalg.norm(end_effector_position - self.target_position)
+            print(error.shape , 'kurwa shape ')
             return error
         #bounds = [(0, 10), (-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
         initial_guess = self.list_of_parameters
@@ -134,7 +165,7 @@ class Kinematics:
             self.plotting_points()
             self.show_table()
         else:
-            print("Optimization failed.")
+            print("Optimization failed.") """
 
 
 # Example usage:
@@ -151,16 +182,16 @@ k.add_mask(  [0 , 1 , 0 , 0])
 k.add_values([0, 0, 100, np.radians(90)])
 k.add_mask(  [0 , 0 , 0 ,0])
 
-k.add_values([np.radians(0), 0, 120, 0])
+k.add_values([np.radians(0), 0, 100, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
-k.add_values([np.radians(0), 0, 120, 0])
+k.add_values([np.radians(0), 0, 100, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
-k.add_values([np.radians(0), 0, 140, 0])
+k.add_values([np.radians(0), 0, 100, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
-k.show_mask()
+#k.show_mask()
 
 
 
