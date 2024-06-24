@@ -2,6 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+np.warnings.filterwarnings('ignore')
 
 class Kinematics:
     def __init__(self):
@@ -13,7 +14,7 @@ class Kinematics:
         self.indexes_to_optimize=[]
         self.list_of_parameters = []
 
-        
+       #####################    BASIC FUNCTIONS ################################### 
 
     def Transform_matrix(self, theta, d, a, alfa):
         T = np.array([[np.cos(theta), -np.sin(theta)*np.cos(alfa), np.sin(alfa)*np.sin(theta), a*np.cos(theta)],
@@ -37,13 +38,32 @@ class Kinematics:
                 #print(self.mask[i][j])
                 if self.mask[i][j] == 1 :
                     self.indexes_to_optimize.append([i,j])
-        print(self.indexes_to_optimize)
-    def get_variables_to_optimize(self,array_of_params):
+        #print(self.indexes_to_optimize)
+
+    def get_variables_to_optimize(self):
         self.list_of_parameters=[]
-        for i in array_of_params:
+        for i in self.indexes_to_optimize:
             self.list_of_parameters.append(self.Table[i[0]][i[1]])
-        print(self.list_of_parameters)
-        return 
+        #print(self.list_of_parameters)
+
+    def change_variables_to_optimize(self,D1_array):
+        list_of_parameters_swap = []
+        for i in range(len(self.list_of_parameters)):
+            list_of_parameters_swap.append(D1_array)
+        self.list_of_parameters = np.array(list_of_parameters_swap)
+        #print(self.list_of_parameters)
+        #print(list_of_parameters_swap)
+
+   
+    def swap_table_variables(self):
+        k = 0 
+        for i in (self.indexes_to_optimize):
+            self.Table[i[0]][i[1]] = self.list_of_parameters[k]
+            #print('those are i and j',[i[0],  i[1]])
+            #print("this is k " ,k)
+            #print('the value to be put into the table ' ,   self.list_of_parameters[k])
+            k=k+1
+            
         
 
     def show_table(self, angles_in_degrees=True):
@@ -80,6 +100,11 @@ class Kinematics:
             result = np.linalg.multi_dot(m[0:i+2])
             print(result[:3,3])
             self.positions.append(result[:3, 3])
+ #####################    BASIC FUNCTIONS ################################### 
+
+
+
+
 
     def plotting_points(self):
         positions_array = np.array(self.positions)
@@ -105,33 +130,47 @@ class Kinematics:
         plt.legend()
         
         plt.show()
-
     def inverse_kinematics_optimization(self):
+        k.get_indexes_to_optimize()
+        k.get_variables_to_optimize()
+        def objective_function(self):
+            k.change_variables_to_optimize([200,10,0,0])
+            k.swap_table_variables()
+            self.get_transformed_values()
+            end_f_matrix=np.linalg.multi_dot(self.Matrices)
+            end_effector_position = end_f_matrix[:3, 3]
+            #error = np.linalg.norm(end_effector_position - self.target_position)
+            error = np.array(end_effector_position)
+            print(error.shape , 'this is suppouse to be error ')
+        objective_function(self)
+""" 
+    def inverse_kinematics_optimization(self):
+        k.get_indexes_to_optimize()
+        k.get_variables_to_optimize(self.indexes_to_optimize)
         def objective_function(params):
             self.list_of_parameters = params
-            self.Table[0][1] = a
-            self.Table[2][0] = theta1
-            self.Table[3][0] = theta2
-            self.Table[4][0] = theta3
+            Kinematics.swap_table_variables(self)
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
             error = np.linalg.norm(end_effector_position - self.target_position)
+            print(error.shape , 'kurwa shape ')
             return error
         #bounds = [(0, 10), (-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
-        initial_guess = [self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0]]
+        initial_guess = self.list_of_parameters
         bounds = [(None, None), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2), (-np.pi/2, np.pi/2)]
         result = minimize(objective_function, initial_guess, method='L-BFGS-B', tol=1e-4 , bounds=bounds)
         print(result)
         if result.success:
             optimized_params = result.x
-            self.Table[0][1], self.Table[2][0], self.Table[3][0], self.Table[4][0] = optimized_params
+            self.indexes_to_optimize = optimized_params
+            swap_table_variables(self.indexes_to_optimize)
             self.get_transformed_values()
             self.geting_positions()
             self.plotting_points()
             self.show_table()
         else:
-            print("Optimization failed.")
+            print("Optimization failed.") """
 
 
 # Example usage:
@@ -148,18 +187,22 @@ k.add_mask(  [0 , 1 , 0 , 0])
 k.add_values([0, 0, 100, np.radians(90)])
 k.add_mask(  [0 , 0 , 0 ,0])
 
-k.add_values([np.radians(0), 0, 120, 0])
-k.add_mask([1 , 0 , 0 , 0])
-k.add_values([np.radians(0), 0, 120, 0])
-k.add_mask([1 , 0 , 0 , 0])
-k.add_values([np.radians(0), 0, 140, 0])
+k.add_values([np.radians(0), 0, 100, 0])
 k.add_mask([1 , 0 , 0 , 0])
 
-k.show_mask()
-k.get_variables_to_optimize()
+k.add_values([np.radians(0), 0, 100, 0])
+k.add_mask([1 , 0 , 0 , 0])
+
+k.add_values([np.radians(0), 0, 100, 0])
+k.add_mask([1 , 0 , 0 , 0])
+
+#k.show_mask()
 
 
-#k.set_target_position(target_position)
 
-#k.get_transformed_values()
-#k.inverse_kinematics_optimization()
+
+
+k.set_target_position(target_position)
+
+k.get_transformed_values()
+k.inverse_kinematics_optimization()
