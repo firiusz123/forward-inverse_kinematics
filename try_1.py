@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-np.warnings.filterwarnings('ignore')
+np.seterr(all="ignore")
 
 class Kinematics:
     def __init__(self):
@@ -139,10 +139,11 @@ class Kinematics:
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
-            #error = np.linalg.norm(end_effector_position - self.target_position)
-            error = np.array(end_effector_position)
+            error = np.linalg.norm(end_effector_position - self.target_position)
+            #error = np.array(end_effector_position)
             print(error.shape , 'this is suppouse to be error ')
         objective_function(self)
+        
 """ 
     def inverse_kinematics_optimization(self):
         k.get_indexes_to_optimize()

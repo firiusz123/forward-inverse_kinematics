@@ -91,6 +91,32 @@ class Kinematics:
                     self.indexes_to_optimize.append([i,j])
 
         print((self.indexes_to_optimize))
+    def get_params_to_optimize(self):
+        params = []
+        for row,column in self.indexes_to_optimize:
+            params.append(self.Table[row][column])
+            
+        return params
+    
+    def swap_parameters(self,values):
+        if len(values) != len(self.indexes_to_optimize):
+            print("amount of parameters is not equal to amount of indexes of parameters , internal error ")
+        else:
+            index = 0
+            for row,column in self.indexes_to_optimize:
+                self.Table[row][column] =values[index]
+                index = index + 1 
+        kinematics.show_table()
+    def objective_function(self):
+        
+        params = kinematics.get_params_to_optimize()
+        kinematics.swap_parameters([1,2,3,40])
+        
+
+        
+    
+        
+
             
 # Example usage
 kinematics = Kinematics()
@@ -101,7 +127,7 @@ kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
 kinematics.add_values([np.radians(45), 0, 5, 0])
 kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
 kinematics.add_values([np.radians(30), 0, 5, 0])
-kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
+kinematics.add_optimazing_mask([1 , 0 , 1, 0])
 #kinematics.add_values([np.radians(45), 0, 2, np.radians(0)])
 #kinematics.add_values([np.radians(60), 1, 1, np.radians(-45)])
 
@@ -113,3 +139,4 @@ kinematics.get_positions_matrices()
 kinematics.get_positions()
 #kinematics.plot_mechanism()
 kinematics.get_optimazing_mask()
+kinematics.objective_function()
