@@ -76,9 +76,9 @@ class Kinematics:
         
         # Plot lines in blue
         ax.plot(x, y, z, color='blue')
-        ax.set_xlim([-10, 10])
-        ax.set_ylim([-10, 10])
-        ax.set_zlim([-10, 10])
+        #ax.set_xlim([-10, 10])
+        #ax.set_ylim([-10, 10])
+        #ax.set_zlim([-10, 10])
         
         ax.set_xlabel('X axis')
         ax.set_ylabel('Y axis')
@@ -86,11 +86,12 @@ class Kinematics:
         plt.show()
     def get_optimazing_mask(self):
         for i in range(len(self.optimazing_mask)):
-            for j in range(len(self.optimazing_mask)):
+            for j in range(len(self.optimazing_mask[i])):
+                #print(i , j)
                 if self.optimazing_mask[i][j] == 1:
                     self.indexes_to_optimize.append([i,j])
 
-        print((self.indexes_to_optimize))
+        #print((self.indexes_to_optimize))
     def get_params_to_optimize(self):
         params = []
         for row,column in self.indexes_to_optimize:
@@ -106,11 +107,18 @@ class Kinematics:
             for row,column in self.indexes_to_optimize:
                 self.Table[row][column] =values[index]
                 index = index + 1 
-        kinematics.show_table()
+        #kinematics.show_table()
     def objective_function(self):
-        
+        print(self.indexes_to_optimize)
+        print(self.optimazing_mask)
+        print(self.positions)
         params = kinematics.get_params_to_optimize()
-        kinematics.swap_parameters([1,2,3,40])
+        kinematics.swap_parameters([123,456])
+        kinematics.get_transformed_values()
+        kinematics.get_positions_matrices()
+        kinematics.get_positions()
+        print(self.positions)
+        kinematics.plot_mechanism()
         
 
         
@@ -122,21 +130,28 @@ class Kinematics:
 kinematics = Kinematics()
 
 # Add DH parameters for each joint (theta, d, a, alfa)
-kinematics.add_values([np.radians(45), 0, 5, 0])
-kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
-kinematics.add_values([np.radians(45), 0, 5, 0])
-kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
-kinematics.add_values([np.radians(30), 0, 5, 0])
-kinematics.add_optimazing_mask([1 , 0 , 1, 0])
+kinematics.add_values([0, 0, 5, 0])
+kinematics.add_optimazing_mask([0 , 0 , 1 , 0])
+kinematics.add_values([0, 3, 0, 0])
+kinematics.add_optimazing_mask([0 , 1 , 0 , 0])
+#kinematics.add_values([np.radians(45), 0, 5, 0])
+#kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
+#kinematics.add_values([np.radians(45), 0, 5, 0])
+#kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
+#kinematics.add_values([np.radians(30), 0, 5, 0])
+#kinematics.add_optimazing_mask([1 , 0 , 1, 0])
 #kinematics.add_values([np.radians(45), 0, 2, np.radians(0)])
 #kinematics.add_values([np.radians(60), 1, 1, np.radians(-45)])
 
 # Show DH parameters table
 kinematics.show_table()
+
+kinematics.get_optimazing_mask()
+
 kinematics.get_transformed_values()
 
 kinematics.get_positions_matrices()
 kinematics.get_positions()
-#kinematics.plot_mechanism()
-kinematics.get_optimazing_mask()
+kinematics.plot_mechanism()
+
 kinematics.objective_function()
