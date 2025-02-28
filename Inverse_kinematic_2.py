@@ -81,11 +81,12 @@ class Kinematics:
 
     def inverse_kinematics_optimization(self, target_position):
         def objective_function(params):
-            a, theta1, theta2, theta3 = params
-            self.Table[0][1] = a
-            self.Table[2][0] = theta1
-            self.Table[3][0] = theta2
-            self.Table[4][0] = theta3
+            a, theta1, theta2, theta3 , theta4 = params
+            self.Table[0][3] = a
+            self.Table[1][0] = theta1
+            self.Table[2][0] = theta2
+            self.Table[3][0] = theta3
+            self.Table[4][1] = theta4
             self.get_transformed_values()
             end_f_matrix=np.linalg.multi_dot(self.Matrices)
             end_effector_position = end_f_matrix[:3, 3]
@@ -109,17 +110,17 @@ class Kinematics:
 
 # Example usage:
 # Target end-effector position
-target_position = np.array([324.85281, 102.42641, 277.40774] )
+target_position = np.array([-80, 450, 0] )
 
 
 k = Kinematics()
 
 # Define DH parameters
-k.add_values([0, 100, 0, 0])
-k.add_values([0, 0, 100, np.radians(90)])
-k.add_values([np.radians(0), 0, 120, 0])
-k.add_values([np.radians(0), 0, 120, 0])
-k.add_values([np.radians(0), 0, 140, 0])
+k.add_values([0, 0, 70, 0])
+k.add_values([0, 0, 200, 0])
+k.add_values([-np.pi, 0, 250, 0])
+k.add_values([np.radians(0), 0, 0, np.pi])
+k.add_values([np.radians(0), 0, 0, 0])
 
 
 k.get_transformed_values()

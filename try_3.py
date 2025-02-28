@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -108,20 +109,23 @@ class Kinematics:
                 self.Table[row][column] =values[index]
                 index = index + 1 
         #kinematics.show_table()
-    def objective_function(self):
-        print(self.indexes_to_optimize)
-        print(self.optimazing_mask)
-        print(self.positions)
-        params = kinematics.get_params_to_optimize()
-        kinematics.swap_parameters([123,456])
-        kinematics.get_transformed_values()
-        kinematics.get_positions_matrices()
-        kinematics.get_positions()
-        print(self.positions)
-        kinematics.plot_mechanism()
-        
+    def objective_function(self, parameters, target_position):
+        self.swap_parameters(parameters)
+        self.get_transformed_values()
+        self.get_positions_matrices()
+        self.get_positions()
+        end_effector_position = self.positions[-1]
+        loss = np.sum(np.square(end_effector_position - target_position))  # Mean Squared Error
+        return loss
 
-        
+    def inverse(self, target_position,method='L-BFGS-B', num_epochs=100, learning_rate=0.01):
+       kinematics.get_optimazing_mask()
+       params_to_optimize = kinematics.get_params_to_optimize()
+       result = minimize(kinematics.objective_function, params_to_optimize, args=(target_position,),method=method) 
+       kinematics.swap_parameters(result.x)
+       #kinematics.plot_mechanism()
+       kinematics.show_table()
+       return result.x, result
     
         
 
@@ -133,6 +137,8 @@ kinematics = Kinematics()
 kinematics.add_values([0, 0, 5, 0])
 kinematics.add_optimazing_mask([0 , 0 , 1 , 0])
 kinematics.add_values([0, 3, 0, 0])
+kinematics.add_optimazing_mask([0 , 1 , 0 , 0])
+kinematics.add_values([0, 20, 0, 0])
 kinematics.add_optimazing_mask([0 , 1 , 0 , 0])
 #kinematics.add_values([np.radians(45), 0, 5, 0])
 #kinematics.add_optimazing_mask([1 , 0 , 0 , 0])
@@ -152,6 +158,6 @@ kinematics.get_transformed_values()
 
 kinematics.get_positions_matrices()
 kinematics.get_positions()
-kinematics.plot_mechanism()
+#kinematics.plot_mechanism()
 
-kinematics.objective_function()
+kinematics.inverse([5,0,20])
